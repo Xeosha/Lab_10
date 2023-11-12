@@ -135,11 +135,14 @@ static void DisplayBinarySearch(Goods[] products)
     goodsList.Sort((x, y) => x.Name.CompareTo(y.Name));
 
     Console.Write("Введите название товара, который ищете: ");
-    var name = Console.ReadLine();
+    string? name = Console.ReadLine();
 
     var result = Requests.BinarySearchByName(goodsList, name);
 
-    Console.WriteLine("Найденный товар:\n" + result);
+    if (result is not null)
+        Console.WriteLine("Найденный товар:\n" + result);
+    else
+        Console.WriteLine("Товар не найден.");
 
 }
 
@@ -149,7 +152,7 @@ static void RequestsMenu(Goods[] products)
     dialog.AddOption("Сумма товаров заданного наименования", () => DisplayTotalPrices(products));
     dialog.AddOption("Количество товаров заданного наименования", () => DisplayCountProducts(products));
     dialog.AddOption("Самые дорогие и дешевые игрушки", () => DisplayMinAndMaxToysPrices(products));
-    dialog.AddOption("Бинарный поиск по цене", () => DisplayBinarySearch(products));
+    dialog.AddOption("Бинарный поиск по названию товара", () => DisplayBinarySearch(products));
     dialog.Start();
 }
 
@@ -239,6 +242,7 @@ static void DisplayClone()
     foreach (var item in shallowCopyProduct.Tags)
         Console.Write(item + " ");
     Console.WriteLine();
+
 
 }
 

@@ -11,13 +11,13 @@ namespace Lab_10
     {
         
         // Суммарная стоимость товара заданного наименования.
-        public static double GetTotalPriceOfGoods(Goods[] goods, string goodsName)
+        public static double GetTotalPriceOfGoods(Goods[] goods, string? goodsName)
         {
             return goods.Where(g => g.Name == goodsName).Sum(g => g.Price);
         }
 
         // Количество товара заданного наименования
-        public static int GetCountOfGoods(Goods[] goods, string goodsName)
+        public static int GetCountOfGoods(Goods[] goods, string? goodsName)
         {
             return goods.Count(g => g.Name == goodsName);
         }
@@ -58,8 +58,9 @@ namespace Lab_10
             return min;
         }
 
-        public static Goods? BinarySearchByName(List<Goods> goodsList, string target)
+        public static Goods? BinarySearchByName(List<Goods> goodsList, string? target)
         {
+            if (target is null) return null;
             int min = 0;
             int max = goodsList.Count - 1;
             while (min <= max)
