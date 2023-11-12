@@ -29,13 +29,18 @@ static Goods[] CreateRandomGoodsArray()
 
 static Goods GetMenuTypeProducts(int position)
 {
-    Goods goods = new Goods();
+    var goods = new Goods();
     var dialog = new Dialog($"Выберите тип товара для {position} позиции. Если создали, нажмите ESC. Если не выберите - рандом.");
     dialog.AddOption("Базовый класс (Товар)", () => { goods = new Goods(); goods.Init(); });
     dialog.AddOption("Игрушка", () => { goods = new Toy(); goods.Init(); });
     dialog.AddOption("Продукт", () => { goods = new Product(); goods.Init(); });
     dialog.AddOption("Молочный продукт", () => { goods = new MilkProduct(); goods.Init(); });
     dialog.Start();
+
+    Console.WriteLine("Созданный товар:\n" + goods);
+    Console.WriteLine("\nНажмите любую клавишу для продолжения...");
+    Console.ReadKey(true);
+
     return goods;
 }
 
@@ -46,6 +51,7 @@ static Goods[] CreateKeyboardGoodsArray()
     for (int i = 0; i < size; i++)
     {
         products[i] = GetMenuTypeProducts(i+1);
+       
     }
 
     return products;
@@ -93,7 +99,7 @@ static void DisplayNoVirtual(Goods[] products)
     {
         Console.WriteLine(count++);
         Console.WriteLine(product.GetType());
-        product.Show();
+        product.SelfShow();
         Console.WriteLine();
     }
 }
@@ -122,12 +128,28 @@ static void DisplayMinAndMaxToysPrices(Goods[] products)
         Console.WriteLine($"Название самых дорогих и дешевых игрушек: {max.Name} {min.Name}");
 }
 
+static void DisplayBinarySearch(Goods[] products)
+{
+    var goodsList = new List<Goods>(products);
+
+    goodsList.Sort((x, y) => x.Name.CompareTo(y.Name));
+
+    Console.Write("Введите название товара, который ищете: ");
+    var name = Console.ReadLine();
+
+    var result = Requests.BinarySearchByName(goodsList, name);
+
+    Console.WriteLine("Найденный товар:\n" + result);
+
+}
+
 static void RequestsMenu(Goods[] products)
 {
     var dialog = new Dialog("Запросы");
     dialog.AddOption("Сумма товаров заданного наименования", () => DisplayTotalPrices(products));
     dialog.AddOption("Количество товаров заданного наименования", () => DisplayCountProducts(products));
     dialog.AddOption("Самые дорогие и дешевые игрушки", () => DisplayMinAndMaxToysPrices(products));
+    dialog.AddOption("Бинарный поиск по цене", () => DisplayBinarySearch(products));
     dialog.Start();
 }
 
@@ -139,11 +161,110 @@ static void Display(Goods[] products)
     dialog.Start();
 }
 
-var products = Array.Empty<Goods>();
 
-var dialog = new Dialog("10-ая Лабораторная работа");
-dialog.AddOption("Создание массива товаров", () => products = CreateArray(), true);
-dialog.AddOption("Вывод товаров", () => Display(products), true);
-dialog.AddOption("Выполнение запросов", () => RequestsMenu(products), true);
+static void DisplayIInit()
+{
+    Console.WriteLine("\tИнтерфейс IInit: ");
+    IInit[] objects = new IInit[]
+       {
+            new Goods(),
+            new Product(),
+            new MilkProduct(),
+            new Toy(),
+            new NonHierarchicalClass()
+       };
 
-dialog.Start();
+    Console.WriteLine("IInit[5] objects = new IInit[5] - состоит из объектов Goods, Product, MilkProduct, Toy, NonHierarhicalClass");
+
+    int count = 1;
+    foreach (var item in objects)
+    {
+        Console.WriteLine($"Создается объект под номером {count++}: {item.GetType()}");
+        item.RandomInit();
+        Console.WriteLine(item + "\n");
+    }
+}
+
+static void DisplaySortIComparable()
+{
+    Goods[] products = CreateRandomGoodsArray();
+
+    Array.Sort(products);
+    Console.WriteLine("Отсортированный массив: ");
+    DisplayVirtual(products);
+}
+
+static void DisplaySortICompare()
+{
+    Goods[] products = CreateRandomGoodsArray();
+
+    Array.Sort(products, new SortByPrice());
+    Console.WriteLine("Отсортированный массив по цене: ");
+    DisplayVirtual(products); 
+
+
+}
+
+static void DisplayClone()
+{
+    var originalProduct = new Goods();
+    originalProduct.Tags = new List<string> { "1", "2", "3" };
+    var clonedProduct = (Goods)originalProduct.Clone();
+
+    Console.WriteLine("До изменения полное копирование:");
+    foreach (var item in clonedProduct.Tags)
+        Console.Write(item + " ");
+    Console.WriteLine();
+
+    originalProduct.Tags.Clear();
+
+    Console.WriteLine("После изменеия полное копирование:");
+    foreach (var item in clonedProduct.Tags)
+        Console.Write(item + " ");
+    Console.WriteLine();
+
+    
+    originalProduct = new Goods();
+    originalProduct.Tags = new List<string> { "1", "2", "3" };
+    var shallowCopyProduct = originalProduct.ShallowCopy();
+
+    Console.WriteLine("До изменения неполное копирование:");
+    foreach (var item in shallowCopyProduct.Tags)
+        Console.Write(item + " ");
+    Console.WriteLine();
+
+    originalProduct.Tags.Clear();
+
+    Console.WriteLine("После изменения неполное копирование:");
+    foreach (var item in shallowCopyProduct.Tags)
+        Console.Write(item + " ");
+    Console.WriteLine();
+
+}
+
+static void Task3()
+{
+    var dialog = new Dialog("Задание 3");
+    dialog.AddOption("Демонстрация интерфейса IInit", DisplayIInit);
+    dialog.AddOption("Демонстрация сортировки, используя стандартный интерфейс IComparable", DisplaySortIComparable);
+    dialog.AddOption("Демонстация сортировки по цене, используя ICompare", DisplaySortICompare);
+    dialog.AddOption("Создание клонов, их демонстрация", DisplayClone);
+    dialog.Start();
+
+}
+
+
+void Main()
+{
+    var products = Array.Empty<Goods>();
+
+    var dialog = new Dialog("10-ая Лабораторная работа");
+    dialog.AddOption("Создание массива товаров", () => products = CreateArray(), true);
+    dialog.AddOption("Вывод товаров", () => Display(products), true);
+    dialog.AddOption("Выполнение запросов", () => RequestsMenu(products), true);
+    dialog.AddOption("Задание 3. Клоны, сортировки и т.д.", Task3, true);
+
+    dialog.Start();
+}
+
+Main(); 
