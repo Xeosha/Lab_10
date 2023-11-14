@@ -210,8 +210,10 @@ static void DisplaySortICompare()
 
 static void DisplayClone()
 {
-    var originalProduct = new Goods();
-    originalProduct.Tags = new List<string> { "1", "2", "3" };
+    var originalProduct = new Goods
+    {
+        Tags = new List<string> { "1", "2", "3" }
+    };
     var clonedProduct = (Goods)originalProduct.Clone();
 
     Console.WriteLine("До изменения полное копирование:");
@@ -226,9 +228,11 @@ static void DisplayClone()
         Console.Write(item + " ");
     Console.WriteLine();
 
-    
-    originalProduct = new Goods();
-    originalProduct.Tags = new List<string> { "1", "2", "3" };
+
+    originalProduct = new Goods
+    {
+        Tags = new List<string> { "1", "2", "3" }
+    };
     var shallowCopyProduct = originalProduct.ShallowCopy();
 
     Console.WriteLine("До изменения неполное копирование:");
@@ -257,7 +261,6 @@ static void Task3()
 
 }
 
-
 void Main()
 {
     var products = Array.Empty<Goods>();
@@ -268,7 +271,8 @@ void Main()
     dialog.AddOption("Выполнение запросов", () => RequestsMenu(products), true);
     dialog.AddOption("Задание 3. Клоны, сортировки и т.д.", Task3, true);
 
-    dialog.Start();
+    dialog.Start();   
 }
 
 Main(); 
+
